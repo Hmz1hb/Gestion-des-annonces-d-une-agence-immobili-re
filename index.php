@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="en">
 
@@ -5,8 +6,6 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="">
-  <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
-  <meta name="generator" content="Hugo 0.72.0">
   <title>Boulvard</title>
 
   <link rel="canonical" href="https://v5.getbootstrap.com/docs/5.0/examples/album/">
@@ -14,6 +13,7 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
 <link rel="stylesheet" href="./style.css">
+
 </head>
 
 <body>
@@ -40,7 +40,7 @@
     <div class="navbar navbar-dark bg-light shadow-sm">
       <div class="container">
         <a href="#" class="navbar-brand d-flex align-items-center">
-          <img src="./Img/boul-removebg-preview.png" alt="Boulvard" width="30%"  fill="none"> 
+          <img src="./img/boul-removebg-preview.png" alt="Boulvard" width="30%"  fill="none"> 
         </a>
         <button class="navbar-toggler bg-secondary offset-md-1" type="button" data-toggle="collapse" data-target="#navbarHeader"
           aria-controls="navbarHeader" aria-expanded="false" aria-label="Toggle navigation">
@@ -94,21 +94,55 @@
         </section>
 
         <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-3">
-          <div class="col">
-            <div class="card shadow-sm">
-              <img id="card_img" src="./Img/appartement1.jpg" alt="1" width="100%" height="225" fill="none">
-              <div class="card-body">
-                <h4 id="card_title">Title</h4>
-                <p id="card_text" class="card-text">Ooops it not working</p>
-                <div class="d-flex justify-content-between align-items-center">
-                  <div class="btn-group">
-                    <button type="button" id="edit" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#edit_modal">Edit</button>
-                    <button type="button" id="delete" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#delete_modal">Delete</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+        <?php
+// Define database credentials
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "test";
+
+// Create a connection to the database
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check if the connection was successful
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Define a SQL query to retrieve data from the database
+$sql = "SELECT * FROM `annonce`";
+
+// Execute the query and store the result
+$result = $conn->query($sql);
+
+// Check if the query returned any data
+if ($result->num_rows > 0) {
+    // Output data of each row
+    while ($row = $result->fetch_assoc()) {
+        echo '<div class="col">';
+        echo '<div class="card shadow-sm">';
+        $img = ($row['image'] != '') ? $row['image'] : './images/appartement1.jpg';
+        echo '<img id="card_img" src="'.$img.'" alt="'.$row['titre'].'" width="100%" height="225">';
+        echo '<div class="card-body">';
+        echo '<h4 id="card_title">'.$row["titre"].'</h4>';
+        echo '<p id="card_text" class="card-text">'.$row["description"].'</p>';
+        echo '<div class="d-flex justify-content-between align-items-center">';
+        echo '<div class="btn-group">';
+        echo '<button type="button" id="edit" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#edit_modal">Edit</button>';
+        echo '<button type="button" id="delete" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#delete_modal">Delete</button>';
+        echo '</div>';
+        echo '</div>';
+        echo '</div>';
+        echo '</div>';
+        echo '</div>';
+    }
+} else {
+    echo "0 results";
+}
+
+// Close the connection
+$conn->close();
+?>
         </div>
       </div>
     </div>
@@ -156,7 +190,7 @@
         <a href="#">Back to top</a>
     </div>
   </footer>
-
+<script src="./java.js"></script>
 </body>
 
 </html> 
