@@ -129,7 +129,11 @@ if ($result->num_rows > 0) {
         echo '<div class="d-flex justify-content-between align-items-center">';
         echo '<div class="btn-group">';
         echo '<button type="button" id="edit" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#edit_modal">Edit</button>';
-        echo '<button type="button" id="delete" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#delete_modal">Delete</button>';
+        echo '<form action="delete.php" method="post">
+        <input type="hidden" name="id" value="'.$row['id'].'">
+        <input type="submit" value="Delete" class="btn btn-secondary" data-bs-dismiss="modal">
+        </form>';
+        // echo '<button type="button" id="delete" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#delete_modal">Delete</button>';
         echo '</div>';
         echo '</div>';
         echo '</div>';
@@ -159,7 +163,11 @@ $conn->close();
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Delete</button>
+              <form action="delete.php" method="post">
+                <input type="hidden" name="id" value="<?php echo $record_id; ?>">
+                <input type="submit" value="Delete" class="btn btn-secondary" data-bs-dismiss="modal">
+            </form>
+
             </div>
           </div>
         </div>
