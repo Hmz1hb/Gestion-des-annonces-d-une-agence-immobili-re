@@ -1,4 +1,4 @@
-<!-- <?php
+ <?php
 if (isset($_POST['id'])) {
   $record_id = $_POST['id'];
   
@@ -19,7 +19,7 @@ if (isset($_POST['id'])) {
   $stmt->close();
   $conn->close();
 }
-?> -->
+?>
 <!doctype html>
 <html lang="en">
 
@@ -92,7 +92,7 @@ if (isset($_POST['id'])) {
                     <div class="row">
                         <div class="col-lg-12">
                             <div class="row">
-                                <div class="col-lg-3 col-md-3 col-sm-12 p-0">
+                                <div class="col-lg-2 col-md-2 col-sm-12 p-0">
                                     <select class="form-control search-slt" id="exampleFormControlSelect1">
                                         <option value="#">Rental or Sale</option>
                                         <option value="Location">Rental</option>
@@ -105,8 +105,11 @@ if (isset($_POST['id'])) {
                                 <div class="col-lg-3 col-md-3 col-sm-12 p-0">
                                     <input type="text" class="form-control search-slt" placeholder="Enter Maximal price">
                                 </div>
-                                <div class="col-lg-3 col-md-3 col-sm-12 p-0">
+                                <div class="col-lg-2 col-md-2 col-sm-12 p-0">
                                     <button type="button" class="btn btn-danger wrn-btn">Search</button>
+                                </div>
+                                <div class="col-lg-2 col-md-2 col-sm-12 p-0">
+                                    <button type="button" class="btn btn-secondary wrn-btn" data-bs-toggle="modal" data-bs-target="#pub_modal">New Post</button>
                                 </div>
                             </div>
                         </div>
@@ -255,15 +258,123 @@ $conn->close();
                   <label for="formFile" class="form-label">Default file input example</label>
                   <input class="form-control" type="file" id="formFile">
                 </div>
+                <div class="mb-3">
+                  <label for="exampleFormControlTextarea1" class="form-label">Description</label>
+                  <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                  <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Update</button>
+                </div>
               </form>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Update</button>
             </div>
           </div>
         </div>
       </div>
+        <!-- Add modal -->
+        <div class="modal fade" id="pub_modal" data-bs-backdrop="static"  tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5" id="staticBackdropLabel">Announce eddit</h1>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <form action="index.php" method="post" class="row g-2 needs-validation" novalidate>
+                <div class="col-md-4">
+                  <label for="validationCustom01" class="form-label">Title</label>
+                  <input type="text" name="titre" class="form-control" id="validationCustom01" value="Title here" required>
+                  <div class="valid-feedback">
+                    Looks good!
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <label for="validationCustom02" class="form-label">Superficie</label>
+                  <input type="text" class="form-control" id="validationCustom02" value="50M²" name="superficie" required>
+                  <div class="valid-feedback">
+                    Looks good!
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <label for="validationCustomUsername" class="form-label">Prix</label>
+                  <div class="input-group">
+                    <span class="input-group-text" id="inputGroupPrepend">DH</span>
+                    <input type="text" name="prix" class="form-control" id="validationCustomUsername" aria-describedby="inputGroupPrepend" required>
+                    <div class="invalid-feedback">
+                      Please choose a username.
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <label for="validationCustom03" class="form-label">Adresse</label>
+                  <input type="text" name="adresse" class="form-control" id="validationCustom03" required>
+                  <div class="invalid-feedback">
+                    Please provide a valid city.
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <label for="validationCustom04" class="form-label">Type</label>
+                  <select class="form-select" name="type" id="validationCustom04" required>
+                    <option selected disabled value="">Choose...</option>
+                    <option value="Location">Location</option>
+                    <option value="vente">Vente</option>
+                  </select>
+                  <div class="invalid-feedback">
+                    Please select a valid state.
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <label for="validationCustom05" class="form-label">Date d'annonce</label>
+                  <input type="text" class="form-control" name="date" id="validationCustom05" required>
+                  <div class="invalid-feedback">
+                    Please provide a valid zip.
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <label for="formFile" class="form-label">Image</label>
+                  <input class="form-control" type="file" id="formFile">
+                </div>
+                <div class="mb-3">
+                  <label for="exampleFormControlTextarea1" class="form-label">Description</label>
+                  <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" name="description"></textarea>
+                </div>
+                <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button class="btn btn-primary" data-bs-dismiss="modal" type="submit" name="submit" value="Publish">Publish</button>
+            </div>
+              </form> 
+            </div>
+          </div>
+        </div>
+      </div>
+      <?php
+if (isset($_POST['submit'])) {
+    $titre = $_POST['titre'];
+    $superficie = $_POST['superficie'];
+    $prix = $_POST['prix'];
+    $adresse = $_POST['adresse'];
+    $type = $_POST['type'];
+    $date = $_POST['date'];
+    $description = $_POST['description'];
+
+    $conn = mysqli_connect("localhost", "root", "", "test");
+    if (!$conn) {
+        die("Connection failed: " . mysqli_connect_error());
+    }
+
+    $stmt = $conn->prepare("INSERT INTO annonce (titre, superficie, prix, adresse, description, type, date) VALUES (?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("sssssss", $titre, $superficie, $prix, $description, $adresse, $type, $date);
+
+    if ($stmt->execute()) {
+       
+    } else {
+       
+    }
+
+    $stmt->close();
+    mysqli_close($conn);
+}
+?>
   </main>
 
   <footer class="text-muted py-5">
