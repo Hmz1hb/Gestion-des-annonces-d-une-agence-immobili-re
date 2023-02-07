@@ -1,4 +1,25 @@
-
+<!-- <?php
+if (isset($_POST['id'])) {
+  $record_id = $_POST['id'];
+  
+  // Connect to database
+  $conn = new mysqli('localhost', 'root', '', 'test');
+  
+  // Check connection
+  if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+  }
+  
+  // Prepare and execute DELETE statement
+  $sql = "DELETE FROM annonce WHERE id = ?";
+  $stmt = $conn->prepare($sql);
+  $stmt->bind_param('i', $record_id);
+  $stmt->execute();
+    
+  $stmt->close();
+  $conn->close();
+}
+?> -->
 <!doctype html>
 <html lang="en">
 
@@ -12,7 +33,8 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-<link rel="stylesheet" href="./style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.3/jquery.min.js" integrity="sha512-STof4xm1wgkfm7heWqFJVn58Hm3EtS31XFaagaa8VMReCXAkQnJZ+jEy8PCC/iT18dFy95WcExNHFTqLyp72eQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<link rel="stylesheet" href="./style.css?v=<?php echo time(); ?>">
 
 </head>
 
@@ -124,16 +146,14 @@ if ($result->num_rows > 0) {
         $img = ($row['image'] != '') ? $row['image'] : './images/appartement1.jpg';
         echo '<img id="card_img" src="'.$img.'" alt="'.$row['titre'].'" width="100%" height="225">';
         echo '<div class="card-body">';
-        echo '<h4 id="card_title">'.$row["titre"].'</h4>';
+        echo '<h4 id="card_title" class="text-capitalize">'.$row["titre"].'</h4>';
+        echo '<h5 id="card_price" class="text-danger">'.$row["prix"].' DH</h5>';
         echo '<p id="card_text" class="card-text">'.$row["description"].'</p>';
+        echo '<h5 id="annonce-type" class="text-danger">'.$row["type"].'</h5>';
         echo '<div class="d-flex justify-content-between align-items-center">';
         echo '<div class="btn-group">';
-        echo '<button type="button" id="edit" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#edit_modal">Edit</button>';
-        echo '<form action="delete.php" method="post">
-        <input type="hidden" name="id" value="'.$row['id'].'">
-        <input type="submit" value="Delete" class="btn btn-secondary" data-bs-dismiss="modal">
-        </form>';
-        // echo '<button type="button" id="delete" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#delete_modal">Delete</button>';
+        echo '<button type="button" class="edit-btn btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#edit_modal" value="'.$row['id'].'">Edit</button>';
+        echo '<button type="button" class="delete-btn btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#delete_modal" value="'.$row['id'].'">Delete</button>';
         echo '</div>';
         echo '</div>';
         echo '</div>';
@@ -163,29 +183,83 @@ $conn->close();
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <form action="delete.php" method="post">
-                <input type="hidden" name="id" value="<?php echo $record_id; ?>">
-                <input type="submit" value="Delete" class="btn btn-secondary" data-bs-dismiss="modal">
-            </form>
+              <form action="index.php" method="post">
+                <input type="hidden" name="id" id="id-input" value="">
+                <input type="submit" value="Delete" class="btn btn-danger" data-bs-dismiss="modal">
+              </form>
 
             </div>
           </div>
         </div>
       </div>
       <!-- eddit modal -->
-      <div class="modal fade" id="edit_modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-        <div class="modal-dialog">
+      <div class="modal fade" id="edit_modal" data-bs-backdrop="static"  tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
           <div class="modal-content">
             <div class="modal-header">
               <h1 class="modal-title fs-5" id="staticBackdropLabel">Announce eddit</h1>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-              ...
+              <form class="row g-2 needs-validation" novalidate>
+                <div class="col-md-4">
+                  <label for="validationCustom01" class="form-label">Title</label>
+                  <input type="text" class="form-control" id="validationCustom01" value="Title here" required>
+                  <div class="valid-feedback">
+                    Looks good!
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <label for="validationCustom02" class="form-label">Superfice</label>
+                  <input type="text" class="form-control" id="validationCustom02" value="50M²" required>
+                  <div class="valid-feedback">
+                    Looks good!
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <label for="validationCustomUsername" class="form-label">Prix</label>
+                  <div class="input-group">
+                    <span class="input-group-text" id="inputGroupPrepend">DH</span>
+                    <input type="text" class="form-control" id="validationCustomUsername" aria-describedby="inputGroupPrepend" required>
+                    <div class="invalid-feedback">
+                      Please choose a username.
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <label for="validationCustom03" class="form-label">Adresse</label>
+                  <input type="text" class="form-control" id="validationCustom03" required>
+                  <div class="invalid-feedback">
+                    Please provide a valid city.
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <label for="validationCustom04" class="form-label">Type</label>
+                  <select class="form-select" id="validationCustom04" required>
+                    <option selected disabled value="">Choose...</option>
+                    <option value="Location">Location</option>
+                    <option value="vente">Vente</option>
+                  </select>
+                  <div class="invalid-feedback">
+                    Please select a valid state.
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <label for="validationCustom05" class="form-label">Date d'annonce</label>
+                  <input type="text" class="form-control" id="validationCustom05" required>
+                  <div class="invalid-feedback">
+                    Please provide a valid zip.
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <label for="formFile" class="form-label">Default file input example</label>
+                  <input class="form-control" type="file" id="formFile">
+                </div>
+              </form>
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Understood</button>
+              <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Update</button>
             </div>
           </div>
         </div>
