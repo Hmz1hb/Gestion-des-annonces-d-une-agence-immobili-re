@@ -1,0 +1,7 @@
+SELECT * FROM 'annonce'
+WHERE prix BETWEEN min_price AND max_price;
+
+
+---------------
+
+UPDATE annonce SET titre='$titre', superficie='$superficie', prix='$prix', adresse='$adresse', type='$type', date='$date' WHERE id='$id

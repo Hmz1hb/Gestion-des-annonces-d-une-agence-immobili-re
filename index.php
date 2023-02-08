@@ -88,62 +88,92 @@ if (isset($_POST['id'])) {
 
         <section class="search-sec mb-5">
             <div class="container">
-                <form action="#" method="post" novalidate="novalidate">
-                    <div class="row">
-                        <div class="col-lg-12">
-                            <div class="row">
-                                <div class="col-lg-2 col-md-2 col-sm-12 p-0">
-                                    <select class="form-control search-slt" id="exampleFormControlSelect1">
-                                        <option value="#">Rental or Sale</option>
-                                        <option value="Location">Rental</option>
-                                        <option value="vente">Sale</option>
-                                    </select>
-                                </div>
-                                <div class="col-lg-3 col-md-3 col-sm-12 p-0">
-                                    <input type="text" class="form-control search-slt" placeholder="Enter Minimal price">
-                                </div>
-                                <div class="col-lg-3 col-md-3 col-sm-12 p-0">
-                                    <input type="text" class="form-control search-slt" placeholder="Enter Maximal price">
-                                </div>
-                                <div class="col-lg-2 col-md-2 col-sm-12 p-0">
-                                    <button type="button" class="btn btn-danger wrn-btn">Search</button>
-                                </div>
-                                <div class="col-lg-2 col-md-2 col-sm-12 p-0">
-                                    <button type="button" class="btn btn-secondary wrn-btn" data-bs-toggle="modal" data-bs-target="#pub_modal">New Post</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </form>
+            <form action="index.php" method="post" novalidate="novalidate">
+              <div class="row">
+                  <div class="col-lg-12">
+                      <div class="row">
+                          <div class="col-lg-2 col-md-2 col-sm-12 p-0">
+                              <select name="type" class="form-control search-slt" id="exampleFormControlSelect1">
+                                  <option value="#">Rental or Sale</option>
+                                  <option value="Location">Rental</option>
+                                  <option value="vente">Sale</option>
+                              </select>
+                          </div>
+                          <div class="col-lg-3 col-md-3 col-sm-12 p-0">
+                              <input name="min_price" type="text" class="form-control search-slt" placeholder="Enter Minimal price">
+                          </div>
+                          <div class="col-lg-3 col-md-3 col-sm-12 p-0">
+                              <input type="text" name="max_price" class="form-control search-slt" placeholder="Enter Maximal price">
+                          </div>
+                          <div class="col-lg-2 col-md-2 col-sm-12 p-0">
+                              <button type="submit" class="btn btn-danger wrn-btn">Search</button>
+                          </div>
+                          <div class="col-lg-2 col-md-2 col-sm-12 p-0">
+                              <button type="button" class="btn btn-secondary wrn-btn" data-bs-toggle="modal" data-bs-target="#pub_modal">New Post</button>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </form>
+
+
             </div>
         </section>
 
         <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-3">
         <?php
-// Define database credentials
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "test";
+  // Define database credentials
+  $servername = "localhost";
+  $username = "root";
+  $password = "";
+  $dbname = "test";
 
-// Create a connection to the database
-$conn = new mysqli($servername, $username, $password, $dbname);
+  // Create a connection to the database
+  $conn = new mysqli($servername, $username, $password, $dbname);
 
-// Check if the connection was successful
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+  // Check if the connection was successful
+  if ($conn->connect_error) {
+      die("Connection failed: " . $conn->connect_error);
+  }
 
-// Define a SQL query to retrieve data from the database
-$sql = "SELECT * FROM `annonce`";
+  $filter_type = "";
+  $min_price = 0;
+  $max_price = PHP_INT_MAX;
+  
+  if(isset($_POST['type']) && !empty($_POST['type'])) {
+    $filter_type = $_POST['type'];
+  }
+  if(isset($_POST['min_price']) && !empty($_POST['min_price'])) {
+    $min_price = (int)$_POST['min_price'];
+  }
+  if(isset($_POST['max_price']) && !empty($_POST['max_price'])) {
+    $max_price = (int)$_POST['max_price'];
+  }
+  
+  $where_clauses = array();
+  if($filter_type != "#") {
+    $where_clauses[] = "`type`='" . $filter_type . "'";
+  }
+  if($min_price > 0) {
+    $where_clauses[] = "`prix` >= " . $min_price;
+  }
+  if($max_price < PHP_INT_MAX) {
+    $where_clauses[] = "`prix` <= " . $max_price;
+  }
 
-// Execute the query and store the result
-$result = $conn->query($sql);
+  // Define a SQL query to retrieve data from the database
+  $sql = "SELECT * FROM `annonce`";
+  if(!empty($where_clauses)) {
+    $sql .= " WHERE " . implode(" AND ", $where_clauses);
+  }
 
-// Check if the query returned any data
-if ($result->num_rows > 0) {
-    // Output data of each row
-    while ($row = $result->fetch_assoc()) {
+  // Execute the query and store the result
+  $result = $conn->query($sql);
+
+  // Check if the query returned any data
+  if ($result->num_rows > 0) {
+      // Output data of each row
+      while ($row = $result->fetch_assoc()) {
         echo '<div class="col">';
         echo '<div class="card shadow-sm">';
         $img = ($row['image'] != '') ? $row['image'] : './images/appartement1.jpg';
@@ -162,14 +192,14 @@ if ($result->num_rows > 0) {
         echo '</div>';
         echo '</div>';
         echo '</div>';
+      }
+    } else {
+      echo "0 results";
     }
-} else {
-    echo "0 results";
-}
-
-// Close the connection
-$conn->close();
-?>
+    
+    mysqli_close($conn);
+    
+        ?>
         </div>
       </div>
     </div>
@@ -203,17 +233,17 @@ $conn->close();
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-              <form action="index.php" method="post" class="row g-2 needs-validation" novalidate>
-                <div class="col-md-4">
+              <form action="eddit.php" method="post" class="row g-2 needs-validation" novalidate>
+              <div class="col-md-4">
                   <label for="validationCustom01" class="form-label">Title</label>
-                  <input type="text" class="form-control" id="validationCustom01" value="Title here" required>
+                  <input type="text" name="titre" class="form-control" id="validationCustom01" value="Title here" required>
                   <div class="valid-feedback">
                     Looks good!
                   </div>
                 </div>
                 <div class="col-md-4">
-                  <label for="validationCustom02" class="form-label">Superfice</label>
-                  <input type="text" class="form-control" id="validationCustom02" value="50M²" required>
+                  <label for="validationCustom02" class="form-label">Superficie</label>
+                  <input type="text" class="form-control" id="validationCustom02" value="50M²" name="superficie" required>
                   <div class="valid-feedback">
                     Looks good!
                   </div>
@@ -222,7 +252,7 @@ $conn->close();
                   <label for="validationCustomUsername" class="form-label">Prix</label>
                   <div class="input-group">
                     <span class="input-group-text" id="inputGroupPrepend">DH</span>
-                    <input type="text" class="form-control" id="validationCustomUsername" aria-describedby="inputGroupPrepend" required>
+                    <input type="text" name="prix" class="form-control" id="validationCustomUsername" aria-describedby="inputGroupPrepend" required>
                     <div class="invalid-feedback">
                       Please choose a username.
                     </div>
@@ -230,14 +260,14 @@ $conn->close();
                 </div>
                 <div class="col-md-6">
                   <label for="validationCustom03" class="form-label">Adresse</label>
-                  <input type="text" class="form-control" id="validationCustom03" required>
+                  <input type="text" name="adresse" class="form-control" id="validationCustom03" required>
                   <div class="invalid-feedback">
                     Please provide a valid city.
                   </div>
                 </div>
                 <div class="col-md-3">
                   <label for="validationCustom04" class="form-label">Type</label>
-                  <select class="form-select" id="validationCustom04" required>
+                  <select class="form-select" name="type" id="validationCustom04" required>
                     <option selected disabled value="">Choose...</option>
                     <option value="Location">Location</option>
                     <option value="vente">Vente</option>
@@ -248,55 +278,25 @@ $conn->close();
                 </div>
                 <div class="col-md-3">
                   <label for="validationCustom05" class="form-label">Date d'annonce</label>
-                  <input type="text" class="form-control" id="validationCustom05" required>
+                  <input type="text" class="form-control" name="date" id="validationCustom05" required>
                   <div class="invalid-feedback">
                     Please provide a valid zip.
                   </div>
                 </div>
                 <div class="mb-3">
-                  <label for="formFile" class="form-label">Default file input example</label>
+                  <label for="formFile" class="form-label">Image</label>
                   <input class="form-control" type="file" id="formFile">
                 </div>
                 <div class="mb-3">
                   <label for="exampleFormControlTextarea1" class="form-label">Description</label>
-                  <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+                  <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" name="description"></textarea>
                 </div>
                 <div class="modal-footer">
                   <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                  <button type="submit" name="submit" class="btn btn-primary" data-bs-dismiss="modal">Update</button>
+                  <input type="hidden" name="id-input" id="id-input" value="">
+                  <button type="submit" name="submit" id="id-input" class="btn btn-primary" data-bs-dismiss="modal">Update</button>
                 </div>
               </form>
-              <?php
-if (isset($_POST['submit'])) {
-  $id = $_POST['id'];
-  $titre = $_POST['titre'];
-  $superficie = $_POST['superficie'];
-  $prix = $_POST['prix'];
-  $adresse = $_POST['adresse'];
-  $type = $_POST['type'];
-  $date = $_POST['date'];
-
-  $conn = mysqli_connect("localhost", "root", "", "test");
-  if (!$conn) {
-      die("Connection failed: " . mysqli_connect_error());
-  }
-
-  if (!empty($id)) {
-      $sql = "UPDATE annonce SET titre='$titre', superficie='$superficie', prix='$prix', adresse='$adresse', type='$type', date='$date' WHERE id='$id'";
-  } else {
-      $sql = "INSERT INTO annonce (titre, superficie, prix, adresse, type, date)
-      VALUES ('$titre', '$superficie', '$prix', '$adresse', '$type', '$date')";
-  }
-
-  if (mysqli_query($conn, $sql)) {
-      echo "Record updated/created successfully";
-  } else {
-      echo "Error: " . $sql . "<br>" . mysqli_error($conn);
-  }
-
-  mysqli_close($conn);
-}
-?>
             </div>
           </div>
         </div>
@@ -378,7 +378,6 @@ if (isset($_POST['submit'])) {
         </div>
       </div>
   </main>
-
   <footer class="text-muted py-5">
     <div class="container">
       <p class="float-right mb-1">
