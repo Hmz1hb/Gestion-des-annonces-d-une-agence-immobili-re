@@ -13,11 +13,4 @@ deleteBtns.forEach(deleteBtn => {
   });
 });
 
-const editBtns = document.querySelectorAll('.edit-btn');
-editBtns.forEach(editBtn => {
-  editBtn.addEventListener('click', () => {
-    const recordId = editBtn.value;
-    document.querySelector('input[name="id"]').value = recordId;
-  });
-});
-  
+

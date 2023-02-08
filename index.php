@@ -1,4 +1,4 @@
- <?php
+<?php
 if (isset($_POST['id'])) {
   $record_id = $_POST['id'];
   
@@ -190,7 +190,6 @@ $conn->close();
                 <input type="hidden" name="id" id="id-input" value="">
                 <input type="submit" value="Delete" class="btn btn-danger" data-bs-dismiss="modal">
               </form>
-
             </div>
           </div>
         </div>
@@ -204,7 +203,7 @@ $conn->close();
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-              <form class="row g-2 needs-validation" novalidate>
+              <form action="index.php" method="post" class="row g-2 needs-validation" novalidate>
                 <div class="col-md-4">
                   <label for="validationCustom01" class="form-label">Title</label>
                   <input type="text" class="form-control" id="validationCustom01" value="Title here" required>
@@ -264,9 +263,40 @@ $conn->close();
                 </div>
                 <div class="modal-footer">
                   <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                  <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Update</button>
+                  <button type="submit" name="submit" class="btn btn-primary" data-bs-dismiss="modal">Update</button>
                 </div>
               </form>
+              <?php
+if (isset($_POST['submit'])) {
+  $id = $_POST['id'];
+  $titre = $_POST['titre'];
+  $superficie = $_POST['superficie'];
+  $prix = $_POST['prix'];
+  $adresse = $_POST['adresse'];
+  $type = $_POST['type'];
+  $date = $_POST['date'];
+
+  $conn = mysqli_connect("localhost", "root", "", "test");
+  if (!$conn) {
+      die("Connection failed: " . mysqli_connect_error());
+  }
+
+  if (!empty($id)) {
+      $sql = "UPDATE annonce SET titre='$titre', superficie='$superficie', prix='$prix', adresse='$adresse', type='$type', date='$date' WHERE id='$id'";
+  } else {
+      $sql = "INSERT INTO annonce (titre, superficie, prix, adresse, type, date)
+      VALUES ('$titre', '$superficie', '$prix', '$adresse', '$type', '$date')";
+  }
+
+  if (mysqli_query($conn, $sql)) {
+      echo "Record updated/created successfully";
+  } else {
+      echo "Error: " . $sql . "<br>" . mysqli_error($conn);
+  }
+
+  mysqli_close($conn);
+}
+?>
             </div>
           </div>
         </div>
@@ -280,7 +310,7 @@ $conn->close();
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-              <form action="index.php" method="post" class="row g-2 needs-validation" novalidate>
+              <form action="add.php" method="post" class="row g-2 needs-validation" novalidate>
                 <div class="col-md-4">
                   <label for="validationCustom01" class="form-label">Title</label>
                   <input type="text" name="titre" class="form-control" id="validationCustom01" value="Title here" required>
@@ -340,41 +370,13 @@ $conn->close();
                 </div>
                 <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button class="btn btn-primary" data-bs-dismiss="modal" type="submit" name="submit" value="Publish">Publish</button>
+                <button class="btn btn-primary" data-bs-dismiss="modal" type="submit" name="submitP" value="Publish">Publish</button>
             </div>
               </form> 
             </div>
           </div>
         </div>
       </div>
-      <?php
-if (isset($_POST['submit'])) {
-    $titre = $_POST['titre'];
-    $superficie = $_POST['superficie'];
-    $prix = $_POST['prix'];
-    $adresse = $_POST['adresse'];
-    $type = $_POST['type'];
-    $date = $_POST['date'];
-    $description = $_POST['description'];
-
-    $conn = mysqli_connect("localhost", "root", "", "test");
-    if (!$conn) {
-        die("Connection failed: " . mysqli_connect_error());
-    }
-
-    $stmt = $conn->prepare("INSERT INTO annonce (titre, superficie, prix, adresse, description, type, date) VALUES (?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("sssssss", $titre, $superficie, $prix, $description, $adresse, $type, $date);
-
-    if ($stmt->execute()) {
-       
-    } else {
-       
-    }
-
-    $stmt->close();
-    mysqli_close($conn);
-}
-?>
   </main>
 
   <footer class="text-muted py-5">
