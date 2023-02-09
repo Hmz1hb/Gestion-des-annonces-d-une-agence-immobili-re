@@ -1,25 +1,4 @@
-<?php
-if (isset($_POST['id'])) {
-  $record_id = $_POST['id'];
-  
-  // Connect to database
-  $conn = new mysqli('localhost', 'root', '', 'test');
-  
-  // Check connection
-  if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-  }
-  
-  // Prepare and execute DELETE statement
-  $sql = "DELETE FROM annonce WHERE id = ?";
-  $stmt = $conn->prepare($sql);
-  $stmt->bind_param('i', $record_id);
-  $stmt->execute();
-    
-  $stmt->close();
-  $conn->close();
-}
-?>
+
 <!doctype html>
 <html lang="en">
 
@@ -122,58 +101,56 @@ if (isset($_POST['id'])) {
 
         <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-3">
         <?php
-  // Define database credentials
-  $servername = "localhost";
-  $username = "root";
-  $password = "";
-  $dbname = "test";
-
-  // Create a connection to the database
-  $conn = new mysqli($servername, $username, $password, $dbname);
-
-  // Check if the connection was successful
-  if ($conn->connect_error) {
-      die("Connection failed: " . $conn->connect_error);
-  }
-
-  $filter_type = "";
-  $min_price = 0;
-  $max_price = PHP_INT_MAX;
-  
-  if(isset($_POST['type']) && !empty($_POST['type'])) {
-    $filter_type = $_POST['type'];
-  }
-  if(isset($_POST['min_price']) && !empty($_POST['min_price'])) {
-    $min_price = (int)$_POST['min_price'];
-  }
-  if(isset($_POST['max_price']) && !empty($_POST['max_price'])) {
-    $max_price = (int)$_POST['max_price'];
-  }
-  
-  $where_clauses = array();
-  if($filter_type != "#") {
-    $where_clauses[] = "`type`='" . $filter_type . "'";
-  }
-  if($min_price > 0) {
-    $where_clauses[] = "`prix` >= " . $min_price;
-  }
-  if($max_price < PHP_INT_MAX) {
-    $where_clauses[] = "`prix` <= " . $max_price;
-  }
-
-  // Define a SQL query to retrieve data from the database
-  $sql = "SELECT * FROM `annonce`";
-  if(!empty($where_clauses)) {
-    $sql .= " WHERE " . implode(" AND ", $where_clauses);
-  }
-
-  // Execute the query and store the result
-  $result = $conn->query($sql);
-
+   // Define database credentials
+   $servername = "localhost";
+   $username = "root";
+   $password = "";
+   $dbname = "test";
+ 
+   // Create a connection to the database
+   $conn = new mysqli($servername, $username, $password, $dbname);
+ 
+   // Check if the connection was successful
+   if ($conn->connect_error) {
+       die("Connection failed: " . $conn->connect_error);
+   }
+ 
+   $filter_type = "";
+   $min_price = 0;
+   $max_price = PHP_INT_MAX;
+   
+   if(isset($_POST['type']) && !empty($_POST['type'])) {
+     $filter_type = mysqli_real_escape_string($conn, $_POST['type']);
+   }
+   if(isset($_POST['min_price']) && !empty($_POST['min_price'])) {
+     $min_price = (int)$_POST['min_price'];
+   }
+   if(isset($_POST['max_price']) && !empty($_POST['max_price'])) {
+     $max_price = (int)$_POST['max_price'];
+   }
+   
+   $where_clauses = array();
+   if($filter_type != "#") {
+     $where_clauses[] = "`type`='" . $filter_type . "'";
+   }
+   if($min_price > 0) {
+     $where_clauses[] = "`prix` >= " . $min_price;
+   }
+   if($max_price < PHP_INT_MAX) {
+     $where_clauses[] = "`prix` <= " . $max_price;
+   }
+ 
+   // Define a SQL query to retrieve data from the database
+   $sql = "SELECT * FROM `annonce`";
+   if(!empty($where_clauses)) {
+     $sql .= " WHERE " . implode(" AND ", $where_clauses);
+   }
+   // Execute the query and store the result
+   $result = $conn->query($sql);
   // Check if the query returned any data
   if ($result->num_rows > 0) {
       // Output data of each row
-      while ($row = $result->fetch_assoc()) {
+      while ($row = $result->fetch_assoc()) { 
         echo '<div class="col">';
         echo '<div class="card shadow-sm">';
         $img = ($row['image'] != '') ? $row['image'] : './images/appartement1.jpg';
@@ -194,12 +171,42 @@ if (isset($_POST['id'])) {
         echo '</div>';
       }
     } else {
-      echo "0 results";
+     
+$sql = "SELECT * FROM `annonce`";
+
+$result = $conn->query($sql);
+
+
+if ($result->num_rows > 0) {
+    // Output data of each row
+    while ($row = $result->fetch_assoc()) {
+      echo '<div class="col">';
+      echo '<div class="card shadow-sm">';
+      $img = ($row['image'] != '') ? $row['image'] : './images/appartement1.jpg';
+      echo '<img id="card_img" src="'.$img.'" alt="'.$row['titre'].'" width="100%" height="225">';
+      echo '<div class="card-body">';
+      echo '<h4 id="card_title" class="text-capitalize">'.$row["titre"].'</h4>';
+      echo '<h5 id="card_price" class="text-danger">'.$row["prix"].' DH</h5>';
+      echo '<p id="card_text" class="card-text">'.$row["description"].'</p>';
+      echo '<h5 id="annonce-type" class="text-danger">'.$row["type"].'</h5>';
+      echo '<div class="d-flex justify-content-between align-items-center">';
+      echo '<div class="btn-group">';
+      echo '<button type="button" class="edit-btn btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#edit_modal" value="'.$row['id'].'">Edit</button>';
+      echo '<button type="button" class="delete-btn btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#delete_modal" value="'.$row['id'].'">Delete</button>';
+      echo '</div>';
+      echo '</div>';
+      echo '</div>';
+      echo '</div>';
+      echo '</div>';
+    }
+} else {
+}
     }
     
     mysqli_close($conn);
     
         ?>
+
         </div>
       </div>
     </div>
@@ -216,7 +223,7 @@ if (isset($_POST['id'])) {
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <form action="index.php" method="post">
+              <form action="delete.php" method="post">
                 <input type="hidden" name="id" id="id-input" value="">
                 <input type="submit" value="Delete" class="btn btn-danger" data-bs-dismiss="modal">
               </form>
@@ -252,7 +259,7 @@ if (isset($_POST['id'])) {
                   <label for="validationCustomUsername" class="form-label">Prix</label>
                   <div class="input-group">
                     <span class="input-group-text" id="inputGroupPrepend">DH</span>
-                    <input type="text" name="prix" class="form-control" id="validationCustomUsername" aria-describedby="inputGroupPrepend" required>
+                    <input type="text" name="prix" class="form-control" id="validationCustomUsername" title="Please enter a valid number" required>
                     <div class="invalid-feedback">
                       Please choose a username.
                     </div>
@@ -285,7 +292,7 @@ if (isset($_POST['id'])) {
                 </div>
                 <div class="mb-3">
                   <label for="formFile" class="form-label">Image</label>
-                  <input class="form-control" type="file" id="formFile">
+                  <input class="form-control" type="file" id="formFile" name="image">
                 </div>
                 <div class="mb-3">
                   <label for="exampleFormControlTextarea1" class="form-label">Description</label>
@@ -310,7 +317,7 @@ if (isset($_POST['id'])) {
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-              <form action="add.php" method="post" class="row g-2 needs-validation" novalidate>
+              <form action="add.php" method="post" class="row g-2 needs-validation" novalidate enctype="multipart/form-data">
                 <div class="col-md-4">
                   <label for="validationCustom01" class="form-label">Title</label>
                   <input type="text" name="titre" class="form-control" id="validationCustom01" value="Title here" required>
@@ -362,7 +369,7 @@ if (isset($_POST['id'])) {
                 </div>
                 <div class="mb-3">
                   <label for="formFile" class="form-label">Image</label>
-                  <input class="form-control" type="file" id="formFile">
+                  <input class="form-control" type="file" id="formFile" name="image">
                 </div>
                 <div class="mb-3">
                   <label for="exampleFormControlTextarea1" class="form-label">Description</label>
